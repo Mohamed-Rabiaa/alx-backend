@@ -33,7 +33,7 @@ babel = Babel(app)
 
 
 @app.route('/')
-def index():
+def index() -> str:
     """
     index
     """

@@ -29,6 +29,7 @@ class Config():
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.url_map.strict_slashes = False
 babel = Babel(app)
 
 
@@ -37,7 +38,7 @@ def index() -> str:
     """
     index
     """
-    return render_template('1-index.html')
+    return render_template('3-index.html')
 
 
 @babel.localeselector
@@ -45,7 +46,10 @@ def get_locale() -> str:
     """
     Gets the locale from request
     """
-    return request.accept_languages.best_match(Config.LANGUAGES)
+    locale = request.args.get('locale')
+    if locale in app.config['LANGUAGES']:
+        return locale
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 if __name__ == '__main__':
