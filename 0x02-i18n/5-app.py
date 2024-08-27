@@ -14,12 +14,11 @@ Usage:
     Run this module directly to start the Flask web server.
 """
 
-from flask import Flask, render_template, request, g
+from flask import Flask, render_template, request
 from flask_babel import Babel
-from typing import Dict, Optional
 
 
-class Config:
+class Config():
     """
     Config class for Flask app settings.
     """
@@ -33,12 +32,6 @@ app.config.from_object(Config)
 app.url_map.strict_slashes = False
 babel = Babel(app)
 
-users = {
-    1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
-    2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
-    3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
-    4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
-}
 
 @app.route('/')
 def index() -> str:
@@ -58,28 +51,6 @@ def get_locale() -> str:
         return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
-
-def get_user() -> Optional[Dict[str, str]]:
-    """
-    Retrieves the user information based on the login_as query parameter.
-    """
-    id = request.args.get('login_as')
-    if id is None:
-        return None
-    try:
-        user_id = int(id)
-    except ValueError:
-        return None
-    return users.get(user_id)
-
-
-@app.before_request
-def before_request():
-    """
-    Sets the user globally available during the request lifecycle.
-    """
-    g.user = get_user()
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000')
