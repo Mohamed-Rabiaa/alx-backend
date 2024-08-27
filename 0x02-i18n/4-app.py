@@ -16,7 +16,7 @@ Usage:
 
 from flask import Flask, render_template, request, g
 from flask_babel import Babel
-from typing import Dict, Optional
+from typing import Dict, Union
 
 
 class Config:
@@ -45,7 +45,7 @@ def index() -> str:
     """
     index
     """
-    return render_template('3-index.html')
+    return render_template('5-index.html')
 
 
 @babel.localeselector
@@ -59,7 +59,7 @@ def get_locale() -> str:
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-def get_user() -> Optional[Dict[str, str]]:
+def get_user() -> Union[Dict, None]:
     """
     Retrieves the user information based on the login_as query parameter.
     """
@@ -70,11 +70,11 @@ def get_user() -> Optional[Dict[str, str]]:
         user_id = int(id)
     except ValueError:
         return None
-    return users.get(user_id)
+    return users.get(int(user_id))
 
 
 @app.before_request
-def before_request():
+def before_request() -> None:
     """
     Sets the user globally available during the request lifecycle.
     """
