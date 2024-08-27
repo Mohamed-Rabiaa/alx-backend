@@ -14,11 +14,12 @@ Usage:
     Run this module directly to start the Flask web server.
 """
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, g
 from flask_babel import Babel
+from typing import Dict, Union
 
 
-class Config():
+class Config:
     """
     Config class for Flask app settings.
     """
@@ -32,13 +33,20 @@ app.config.from_object(Config)
 app.url_map.strict_slashes = False
 babel = Babel(app)
 
+users = {
+    1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
+    2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
+    3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
+    4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
+}
+
 
 @app.route('/')
 def index() -> str:
     """
     index
     """
-    return render_template('3-index.html')
+    return render_template('5-index.html')
 
 
 @babel.localeselector
@@ -50,6 +58,24 @@ def get_locale() -> str:
     if locale in app.config['LANGUAGES']:
         return locale
     return request.accept_languages.best_match(app.config['LANGUAGES'])
+
+
+def get_user() -> Union[Dict, None]:
+    """
+    Retrieves the user information based on the login_as query parameter.
+    """
+    id = request.args.get('login_as')
+    if id:
+        return users.get(int(id))
+    return None
+
+
+@app.before_request
+def before_request() -> None:
+    """
+    Sets the user globally available during the request lifecycle.
+    """
+    g.user = get_user()
 
 
 if __name__ == '__main__':
