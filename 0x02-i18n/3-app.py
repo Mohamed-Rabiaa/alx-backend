@@ -15,7 +15,7 @@ Usage:
 """
 
 from flask import Flask, render_template, request
-from flask_babel import Babel, gettext
+from flask_babel import Babel
 
 
 class Config():
@@ -29,11 +29,12 @@ class Config():
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.url_map.strict_slashes = False
 babel = Babel(app)
 
 
 @app.route('/')
-def index():
+def index() -> str:
     """
     index
     """
@@ -41,15 +42,14 @@ def index():
 
 
 @babel.localeselector
-def get_locale():
+def get_locale() -> str:
     """
     Gets the locale from request
     """
-    return request.accept_languages.best_match(Config.LANGUAGES)
+    locale = request.accept_languages.best_match(app.config['LANGUAGES'])
+    # print(f"Selected locale: {locale}")
+    return locale
 
-
-gettext('home_title')
-gettext('home_header')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000')
